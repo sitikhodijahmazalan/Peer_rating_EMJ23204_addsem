@@ -324,43 +324,38 @@
             }
         }
 
-        function submitIndividualRating() {
-            const person = document.getElementById('individualSelect').value;
-            const ratingData = {
-                person: person,
-                ratings: { ...currentRating.individual },
-                timestamp: new Date().toISOString(),
-                week: ratings.week
-            };
+function submitIndividualRating() {
+    const person = document.getElementById('individualSelect').value;
+    const ratingData = {
+        person: person,
+        ratings: { ...currentRating.individual },
+        timestamp: new Date().toISOString(),
+        week: ratings.week
+    };
 
-            ratings.individual.push(ratingData);
-            saveRatings();
-            resetForm('individual');
-            updateProgress();
-            addRecentRating('individual', ratingData);
-            
-            // Show success message
-            showSuccessMessage('Individual rating submitted successfully!');
-        }
+    saveRatings("individual", ratingData);
+    resetForm('individual');
+    updateProgress();
+    addRecentRating('individual', ratingData);
+    showSuccessMessage('Individual rating submitted successfully!');
+}
 
-        function submitGroupRating() {
-            const group = document.getElementById('groupSelect').value;
-            const ratingData = {
-                group: group,
-                ratings: { ...currentRating.group },
-                timestamp: new Date().toISOString(),
-                week: ratings.week
-            };
+function submitGroupRating() {
+    const group = document.getElementById('groupSelect').value;
+    const ratingData = {
+        group: group,
+        ratings: { ...currentRating.group },
+        timestamp: new Date().toISOString(),
+        week: ratings.week
+    };
 
-            ratings.group.push(ratingData);
-            saveRatings();
-            resetForm('group');
-            updateProgress();
-            addRecentRating('group', ratingData);
-            
-            // Show success message
-            showSuccessMessage('Group rating submitted successfully!');
-        }
+    saveRatings("group", ratingData);
+    resetForm('group');
+    updateProgress();
+    addRecentRating('group', ratingData);
+    showSuccessMessage('Group rating submitted successfully!');
+}
+
 
         function resetForm(type) {
             if (type === 'individual') {
@@ -439,20 +434,25 @@
             }, 3000);
         }
 
-        function saveRatings() {
-            localStorage.setItem('peerRatings', JSON.stringify(ratings));
-        }
+// Replace localStorage saving with Google Sheets API call
+function saveRatings(type, data) {
+    fetch("https://script.google.com/a/macros/unimap.edu.my/s/AKfycbzDms-tZzF6xsp1MvWDFRMAzUXnR-yYFXia-HANNjHev64W3s5WWkYNCZCYLPoyMO_5/exec", {
+        method: "POST",
+        contentType: "application/json",
+        body: JSON.stringify({
+            type: type,
+            name: type === "individual" ? data.person : data.group,
+            ratings: data.ratings
+        })
+    })
+    .then(res => res.text())
+    .then(txt => {
+        console.log("Saved to Google Sheets:", txt);
+    })
+    .catch(err => {
+        console.error("Error saving to Google Sheets:", err);
+    });
+}
 
-        // Simulate week progression (for demo)
-        setTimeout(() => {
-            if (ratings.week === 1 && (ratings.individual.length > 5 || ratings.group.length > 3)) {
-                ratings.week = 2;
-                saveRatings();
-                updateWeekDisplay();
-                showSuccessMessage('Welcome to Week 2!');
-            }
-        }, 30000);
-    </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9761529473d5389f',t:'MTc1NjM1ODA0MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
-</html>
+
 
