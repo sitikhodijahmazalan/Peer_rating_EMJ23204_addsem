@@ -434,15 +434,17 @@ function submitGroupRating() {
             }, 3000);
         }
 
-// Replace localStorage saving with Google Sheets API call
+// Save ratings to Google Sheets
 function saveRatings(type, data) {
-    fetch("https://script.google.com/a/macros/unimap.edu.my/s/AKfycbzDms-tZzF6xsp1MvWDFRMAzUXnR-yYFXia-HANNjHev64W3s5WWkYNCZCYLPoyMO_5/exec", {
+    fetch("https://script.google.com/a/macros/unimap.edu.my/s/AKfycby4SyunsQd-1rm8qGusclbdrL-g7V8Cq3YccmoSCU_v-7nESks4Xyc7vt74CQJ4JYKF/exec", {
         method: "POST",
-        contentType: "application/json",
+        headers: { "Content-Type": "application/json" }, // ✅ FIXED
         body: JSON.stringify({
             type: type,
             name: type === "individual" ? data.person : data.group,
-            ratings: data.ratings
+            ratings: data.ratings,
+            timestamp: new Date().toISOString(),
+            week: data.week
         })
     })
     .then(res => res.text())
@@ -453,6 +455,7 @@ function saveRatings(type, data) {
         console.error("Error saving to Google Sheets:", err);
     });
 }
+
 
 
 
